@@ -1,65 +1,117 @@
+// ============ HTML elements
+// контейнер з постами 
+const containerPostsElem = document.getElementById('containerPosts');
+// загрузичне вікно
+const loadPageElm = document.getElementById('load-page')
 
-const containerUserCards = document.querySelector('main');
-const modal = document.querySelector('.modal');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const pageButtonsElem = document.getElementById('page-buttons');
 
 
-async function fetchUsers(){
-  // запрос до API 
-  const response = await fetch('https://jsonplaceholder.typicode.com/users');
-  // форматування у JSON 
-  const usersAPI = await response.json(); 
-  if(usersAPI){
-    containerUserCards.innerHTML = '';
-    usersAPI.forEach(user => {
-      const card = document.createElement('div');
-      card.classList.add('card');
-      card.innerHTML = `
-       <div class="card-front" id="${user.id}">
-          <img src="svg/user.svg" alt="">
-          <div class="info">
-            <h2 class="name">Name: ${user.name}</h2>
-            <h3 class="username">Username: ${user.username}</h3>
-            <h4 class="email"> Email: ${user.email}</h4>
-            <a href="${user.website}" target="_blank" class="website">Webseti: ${user.website}</a>
-          </div>
-        </div>
-        <div class="card-down">
-          <p class="city">Cite: ${user.address.city}</p>
-          <p class="address">Address: ${user.address.street}, ${user.address.suite}, ${user.address.zipcode}</p>
-          <p class="phone">Phone: ${user.phone}</p>
-          <p class="geo">GEO: ${user.address.geo.lat} : ${user.address.geo.lng}</p>
-          
-          <p class="company-name">Company: ${user.company.name}</p>
-          <p class="company-catch">Company slogan: ${user.company.catchPhrase}</p>
-          <p class="company-bs">Field of activity: ${user.company.bs}</p>
-        </div>
-      `
-      containerUserCards.appendChild(card);
-    });
+// ========== змінні
+// масив з постами
+let posts = [];
+// масив з постами але відфільтрований
+let postsFilter = [];
+// номер поточної сторінки
+let courentPage = 1;
+// кількість постів на сторінці
+const postsPerPage = 10;
+// загальна кількість сторінок
+let totalPages = 1;
+
+// отримання пстів по API 
+async function getPosts(){
+  const url = 'https://jsonplaceholder.typicode.com/posts';
+  const response = await fetch(url);
+  if(response){
+    posts = await response.json();
+    postsFilter = [...posts];
+    loadPageClose();
   }else{
-    alert('Error!!!')
+    containerPostsElem.innerHTML = `No posts found!!!`
   }
+  renderPostsToContainerPosts();
 }
 
-fetchUsers();
+getPosts();
 
-document.addEventListener('submit', (e)=>{
-  e.preventDefault();
-  fetchUsers();
-  showModal();
+// рендер постів 
+function renderPostsToContainerPosts(){
+  containerPostsElem.innerHTML = '';
+  const start = (courentPage - 1) * postsPerPage;
+  const end = start + postsPerPage;
+  const pageContainer = postsFilter.slice(start, end);
+  pageContainer.forEach(post =>{
+    const postElm = document.createElement('div');
+    postElm.classList.add('post');
+    postElm.innerHTML= `
+    <h2>${post.title}</h2>
+    <p>${post.body}</p>
+    `
+    containerPostsElem.appendChild(postElm);
+  })
+  
+  totalPages = Math.ceil(postsFilter.length / postsPerPage);
+
+  const courentPageElm = document.createElement('div');
+  courentPageElm.classList.add('courent-page');
+  courentPageElm.innerHTML = `
+    <h2>Page ${courentPage} of ${totalPages}</h2>
+  `;
+  containerPostsElem.appendChild(courentPageElm);
+
+  renderPagination();
+  pageContainer.length = 0;
+}
+
+// рендер пагінації
+function renderPagination(){
+  pageButtonsElem.innerHTML = '';
+  let pagesBefore = 3;
+  let pagesAfter = 3;
+  let startPage = courentPage - pagesBefore;
+  if(startPage < 1) startPage = 1;
+  let endPage = startPage + (pagesBefore + pagesAfter);
+  if(endPage >= totalPages) {
+    endPage = totalPages;
+    if(totalPages > (pagesBefore + pagesAfter))
+    startPage = endPage - (pagesBefore + pagesAfter);
+  }
+  for (let i = startPage; i <= endPage; i++){
+    const pageBtn = document.createElement('button');
+    pageBtn.textContent = i;
+    pageBtn.classList.add('page-btn');
+
+    if(i == courentPage){
+      pageBtn.classList.add('active')
+    }
+    pageBtn.addEventListener('click', ()=>{
+      courentPage = i;
+      renderPostsToContainerPosts();
+    })
+    pageButtonsElem.appendChild(pageBtn);
+  }
+  
+  prevBtn.disabled = courentPage == 1;
+  nextBtn.disabled = courentPage == totalPages;
+}
+
+prevBtn.addEventListener('click', ()=>{
+  if(courentPage > 1){
+    courentPage--;
+    renderPostsToContainerPosts();
+  }
 })
 
+nextBtn.addEventListener('click', ()=>{
+  if(courentPage < totalPages){
+    courentPage++;
+    renderPostsToContainerPosts();
+  }
+})
 
-
-let cloceModalSetTimeout;
-function showModal(){
-  modal.classList.add('modal__show');
-  cloceModalSetTimeout = setTimeout(closeModal, 3000);
+function loadPageClose(){
+  loadPageElm.classList.add('load-page-close');
 }
-
-function closeModal(){
-  modal.classList.remove('modal__show');
-  clearTimeout(cloceModalSetTimeout);
-}
-
-modal.addEventListener('click', closeModal)
