@@ -3,41 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fetch API Post</title>
+    <title>Weather APP</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
 
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <header>
-      <h1>Fetch API Post</h1>
-    </header>
-    <main>
-      <div class="container">
-        
-        <div id="containerPosts">
-          <!-- Динамічно з JS  -->
-        </div>
-        
-        <div class="pagination">
-          <button id="prev-btn">Prev</button>
-          <div id="page-buttons">
-            <!-- Динамічно з JS  -->
-          </div>
-          <button id="next-btn">Next</button>
+    <form class="form">
+      <h1 class="title">Weather forecast</h1>
+      <div class="box-serch">
+        <input
+          type="text"
+          id="cityInput"
+          class="cityInput"
+          placeholder="Enter city"
+        />
+        <button id="searchBtn" class="searchBtn" type="submit">Search</button>
+        <div id="toggleTheme" class="toggleTheme">
+          <i class="fa-solid fa-moon"></i>
         </div>
       </div>
-    </main>
+    </form>
+
+    <div id="modal" class="modal modal-close">
+      <div class="modal-body">
+        
+        <button class="modal-close-btn"></button>
+
+        <h2 class="modal-title" id="searchCityText">
+          <!-- Динамічно в JS  61-->
+           <img src="" alt="">
+        </h2>
+        
+        <div class="modal-container-toDay" id="modalContainerToDay">
+          <!-- Динамічно в JS  68 -->
+        </div>
+
+        <div class="modal-container-sevenDay" id="modalContainerSevenDay">
+          <!-- Динамічно в JS  84-->
+        </div>
+      </div>
+    </div>
 
     <footer>
       <h6>
-        <a href="https://t.me/sashka_UA_1" target="_blank">Developer: Ekimov Alexander</a>
+        <a href="https://t.me/sashka_UA_1" target="_blank"
+          >Developer: Ekimov Alexander</a
+        >
       </h6>
     </footer>
-
-    <div id="load-page">
-      <div class="load-page__box"></div>
-    </div>
-
 
     <script src="js/script.js"></script>
   </body>
